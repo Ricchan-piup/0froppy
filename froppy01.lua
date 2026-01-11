@@ -1,9 +1,3 @@
--- #include "game_state.lua"
--- #include "actors.lua"
--- #include "ennemies.lua"
--- #include "player.lua"
--- #include "draw_world.lua"
-
 max_actors = 64
 
 function _init()
@@ -36,6 +30,5 @@ function _update()
 end
 
 function _draw()
-	
 	draw_map()
 end
