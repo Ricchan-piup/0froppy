@@ -1,3 +1,4 @@
+-- draw the map and the actors
 function draw_map()
 	
 	cls(1)
