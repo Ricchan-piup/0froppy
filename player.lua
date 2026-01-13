@@ -1,4 +1,4 @@
--- makes
+-- overwrites make_actor to initialize the player (player is added to the actors table by make_actor)
 function make_player()
 
 	local a = make_actor(2, 64, 14*8, 1)
@@ -20,7 +20,7 @@ function make_player()
 	return a
 end
 
-
+-- makes the tongue at the player's location, the data for the tongue can be seen in the actor's table in actors
 function make_tongue(pl)
 
 	local a = make_actor(6, pl.x, pl.y, pl.d)
@@ -40,12 +40,14 @@ function make_tongue(pl)
 
 end
 
+-- TODO: will maybe overwrite this later
 function move_tongue(a)
 
 	move_actor(a)
 
 end
 
+-- draws the tongue and the trail for the tongue to give the impression it stretches al
 function draw_tongue(a)
 
 	for i = 0, abs(a.x-a.x0) do 
@@ -55,6 +57,7 @@ function draw_tongue(a)
 	print(a.x0)
 end
 
+-- movements for the player
 function move_player(pl) 
 
 	move_actor(pl)	
@@ -69,15 +72,16 @@ function move_player(pl)
 		pl.dx = -1
 		pl.d = -1
 	end
-
+	
+	-- w
 	if btn(4) 
 
-	then
-		set_state(pl, "attack")
+	then	
+		set_state(pl, "attack") -- sets state to attack to play animation
 		pl.dx = 0
-		pl.is_attacking = true
+		pl.is_attacking = true -- player can't move while pl.is_attacking is true
 
-		if pl.tongue == nil 
+		if pl.tongue == nil -- makes the sure the tongue only gets spawned once
 		then
 			pl.tongue = make_tongue(pl)
 		else
@@ -85,11 +89,12 @@ function move_player(pl)
 
 	else 	
 		pl.is_attacking = false
-		del(actors, pl.tongue)
+		del(actors, pl.tongue) -- deletes the tongue when player releases w
 		pl.tongue = nil
 	end
 	
-	if pl.dx != 0
+	-- makes sure the frog is in the write state
+	if pl.dx != 0 
 	then
 		set_state(pl, "walk")
 	end 
