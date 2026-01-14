@@ -1,9 +1,7 @@
-
-
 function init_actor_data()
 	
 	--list of index that corresponds to ennemies
-	ennemies = {17, 21}
+	ennemies = {21, 37, 53}
 	
 	--data of all the actors in the game
 	actor_dat = {
@@ -22,19 +20,40 @@ function init_actor_data()
 
 			y = 0, 
 			dx = 0,
-			dy =  1
+			dy =  1,
 		},
 								
 		-- water drop
 		[21] = {
 			k = 21,
 			animations = {
-				iddle = {start = 21, frames = 4, length = 5, loop = true}
+				iddle = {start = 21, frames = 6, length = 3, loop = true}
 			},
-			dx = cos(t()), 
+			dx = 0, 
 			y = 0,
-			dy = 0.5,
-			move = move_water_drop -- example of the move function being overwritten
+			dy = 0.5 -- example of the move function being overwritten
+		},
+
+		-- fire 
+		[37] = {
+			k = 37,
+			animations = {
+				iddle = {start = 37, frames = 1, length = 0, loop = false}
+			},
+			dx = 0,
+			y = 0,
+			dy = 1
+		},
+
+				-- fire 
+		[53] = {
+			k = 53,
+			animations = {
+				iddle = {start = 53, frames = 1, length = 0, loop = false}
+			},
+			dx = 0.2,
+			y = 0,
+			dy = 0.7
 		}
 										
 	}							
@@ -50,13 +69,12 @@ end
 function make_actor(k, x0, y0, d)
 
 	local a = {
-		k=k, -- sprite of actor
+		k=k, -- sprite of actor/identificator in the actor database
 		
 		current_sprite = k,
 		anim_frame = 0,
 		anim_timer = 0,
 		state = "iddle",
-
 		animations = { 
 			iddle = {start = k, frames = 4, length = 10, loop = true}
 		},
@@ -64,9 +82,13 @@ function make_actor(k, x0, y0, d)
 		x=x0, y=y0, 
 		dx=0, dy=0, 
 		ddx=0, ddy=0, 
-		d = 1 or d, 
+		d = 1 or d,
+		w=4, -- hitbox width
+		h=4, -- hitbox height
+		
 		draw=draw_actor, 
-		move=move_actor
+		move=move_actor,
+		collide=default_collide
 
 		}
 		
@@ -84,6 +106,21 @@ function make_actor(k, x0, y0, d)
 		
 end
 
+function hit_test(a) 
+
+	for a2 in all(actors) do 
+		if a2 != a then 
+			local x = a.x + a.dx - a2.x
+			local y = a.y + a.dy - a2.y 
+		
+			if (abs(x) < a.w + a2.w) and (abs(y) < a.h + a2.h) 
+			then
+				return a.collide(a2)
+			end
+		end	
+	end
+	return false
+end	
 
 -- default move function for all the actors, can be overwritten
 function move_actor(a)

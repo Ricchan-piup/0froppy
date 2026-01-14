@@ -31,19 +31,35 @@ function make_tongue(pl)
 	a.dx = pl.d * 2
 	a.dy = -2
 	a.d = pl.d
+	a.w = 2
+	a.h = 2
 
 	a.move = move_tongue
 	a.draw = draw_tongue
+	a.collide = hit_tongue
 
 	return a
 
 
 end
 
+function hit_tongue(other) 
+
+	if (not other.is_player) then
+		del(actors, other)
+		return true
+	end
+		return false
+end
+
 -- TODO: will maybe overwrite this later
 function move_tongue(a)
 
 	move_actor(a)
+
+	if hit_test(a) then
+		del(actors,a)
+	end
 
 end
 
@@ -53,7 +69,6 @@ function draw_tongue(a)
 	for i = 0, abs(a.x-a.x0) do 
 		spr(a.k, a.x0 + a.d*i, a.y0 - i, 1, 1, a.d != 1)
 	end
-
 	print(a.x0)
 end
 
@@ -93,13 +108,13 @@ function move_player(pl)
 		pl.tongue = nil
 	end
 	
-	-- makes sure the frog is in the write state
+	-- makes sure the frog is in the right state
 	if pl.dx != 0 
 	then
 		set_state(pl, "walk")
 	end 
 
-	if pl.dx == 0 and not pl.is_attacking
+	if pl.dx == 0 and not pl.is_attacking 
 	then 
 		set_state(pl, "iddle")
 	end
