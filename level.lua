@@ -12,6 +12,6 @@ function spawn_ennemy()
 	
 	n = rnd(ennemies)
 	
-	make_actor(n, x*8, 0, 1)
+	make_actor(n, x*8, 0)
 	
 end	

@@ -36,30 +36,27 @@ function make_tongue(pl)
 
 	a.move = move_tongue
 	a.draw = draw_tongue
-	a.collide = hit_tongue
+	a.collide_event = tongue_collide_event
 
 	return a
 
 
 end
 
-function hit_tongue(other) 
+function tongue_collide_event(a, other) 
 
 	if (not other.is_player) then
+		del(actors, a)
 		del(actors, other)
-		return true
 	end
-		return false
+	
 end
 
--- TODO: will maybe overwrite this later
+
 function move_tongue(a)
 
 	move_actor(a)
-
-	if hit_test(a) then
-		del(actors,a)
-	end
+	actor_collision(a)
 
 end
 

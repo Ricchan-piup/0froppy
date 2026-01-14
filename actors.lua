@@ -88,7 +88,7 @@ function make_actor(k, x0, y0, d)
 		
 		draw=draw_actor, 
 		move=move_actor,
-		collide=default_collide
+		collide_event=default_collide_event
 
 		}
 		
@@ -106,7 +106,7 @@ function make_actor(k, x0, y0, d)
 		
 end
 
-function hit_test(a) 
+function actor_collision(a) 
 
 	for a2 in all(actors) do 
 		if a2 != a then 
@@ -115,7 +115,7 @@ function hit_test(a)
 		
 			if (abs(x) < a.w + a2.w) and (abs(y) < a.h + a2.h) 
 			then
-				return a.collide(a2)
+				return a:collide_event(a2)
 			end
 		end	
 	end

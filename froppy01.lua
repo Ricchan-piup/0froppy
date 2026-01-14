@@ -9,7 +9,7 @@
 
 max_actors = 64
 counter = 0.1
-delay = 1.5
+delay = 3
 
 function _init()
 	init_actor_data()

@@ -6,5 +6,5 @@ function draw_map()
 	for a in all(actors) do
 		a:draw()
 	end
-	
+
 end
