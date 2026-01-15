@@ -8,6 +8,10 @@ function init_level()
 	for i = 0, 16 do
 		ground[i] = 1
 	end
+
+	ground[-1] = 0
+	ground[16] = 0
+
 	actors = {}
 	pl = make_player()
 	
@@ -28,11 +32,18 @@ function spawn_ennemy()
 	
 end	
 
+function is_floor(x)
+	
+	local x = flr((x+4)/8)
+	return ground[x] == 1
+
+end	
+
+
 -- destroy the floor tile "closest" to x coordinate
 function destroy_floor(x)
 
 	local x=flr((x+4)/8)
-	print(x)
 
 	if (ground[x] != 0) then
 		mset(x, 15, 0)

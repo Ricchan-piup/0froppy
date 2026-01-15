@@ -84,17 +84,20 @@ end
 -- movements for the player
 function move_player(pl) 
 
-	move_actor(pl)	
 	pl.dx = 0
 
-	if btn(➡️) and pl.x < 120 then
-  		pl.dx = 1
+	if btn(➡️) then
 		pl.d = 1
+		if is_floor(pl.x + 4) == true then
+			pl.dx = 1
+		end
 	end
 	
-	if btn(⬅️) and pl.x > 0 then
-		pl.dx = -1
+	if btn(⬅️) then
 		pl.d = -1
+		if is_floor(pl.x - 5) == true then
+			pl.dx = -1
+		end
 	end
 	
 	-- w
@@ -127,5 +130,7 @@ function move_player(pl)
 	then 
 		set_state(pl, "iddle")
 	end
+
+	move_actor(pl)	
 		
 end
