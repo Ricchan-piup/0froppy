@@ -7,9 +7,9 @@ function init_actor_data()
 	actor_dat = {
 		
 		-- tongue
-		[6] = {
-			k = 6,
-		},
+		-- [6] = {
+		-- 	k = 6,
+		-- },
 		-- cat
 		[17] = {
 			k = 17,
@@ -157,6 +157,9 @@ function ennemy_collision_test(a)
 			local x = abs(a.x - pl.x) -- difference of x position between player and projectile
 			local y = abs(a.y - pl.y) -- difference of y position betweeb player and projectile
 			if x < 5 and y < 5  then -- game over if more than half the player overlaps with projectile
+				-- TODO: refactor this into a game over state
+				del(actors, pl.tongue)
+				pl.tongue = nil
 				del(actors, pl)
 				pl = nil
 				del(actors, a)

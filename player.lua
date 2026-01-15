@@ -7,6 +7,7 @@ function make_player()
 	a.move = move_player
 	a.score = 0
 	a.tongue = nil
+	a.cooldown = false
 
 	a.states = {"iddle", "walk", "attack", "tongue_out"}
 
@@ -16,6 +17,7 @@ function make_player()
 		attack = {start = 3, frames = 3, length = 1, loop = false, next_state = "tongue_out"},
 		tongue_out = {start =  6, frames = 1, length = 0, loop = true},
 	}
+
 		
 	return a
 end
@@ -25,6 +27,7 @@ function make_tongue(pl)
 
 	local a = make_actor(6, pl.x, pl.y, pl.d)
 
+	a.k = 6
 	a.x0 = pl.x
 	a.y0 = pl.y
 
@@ -40,11 +43,13 @@ function make_tongue(pl)
 
 	return a
 
-
 end
  
 function tongue_actor_collision_test(a) 
 
+	if a.y > 108  then
+		return
+	end
 	for a2 in all(actors) do 
 		if a2 != a and (not a2.is_player) then 
 
@@ -57,6 +62,8 @@ function tongue_actor_collision_test(a)
 					del(actors, a)
 					a=nil
 					del(actors, a2)
+					set_state(pl, "iddle")
+					pl.cooldown = true
 					return
 				end
 			end
@@ -101,20 +108,23 @@ function move_player(pl)
 	end
 	
 	-- w
-	if btn(4) 
+	if btn(4)
+	then
+		-- the player needs to release w after eating an ennemy to attack again	
+		if not pl.cooldown then 
+			set_state(pl, "attack") -- sets state to attack to play animation
+			pl.dx = 0
+			pl.is_attacking = true -- player can't move while pl.is_attacking is true
 
-	then	
-		set_state(pl, "attack") -- sets state to attack to play animation
-		pl.dx = 0
-		pl.is_attacking = true -- player can't move while pl.is_attacking is true
-
-		if pl.tongue == nil -- makes the sure the tongue only gets spawned once
-		then
-			pl.tongue = make_tongue(pl)
-		else
+			if pl.tongue == nil -- makes the sure the tongue only gets spawned once
+			then
+				pl.tongue = make_tongue(pl)
+			else
 		end
+	end
 
-	else 	
+	else 
+		pl.cooldown = false	
 		pl.is_attacking = false
 		del(actors, pl.tongue) -- deletes the tongue when player releases w
 		pl.tongue = nil
