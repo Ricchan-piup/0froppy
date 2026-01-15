@@ -28,35 +28,48 @@ function make_tongue(pl)
 	a.x0 = pl.x
 	a.y0 = pl.y
 
-	a.dx = pl.d * 2
-	a.dy = -2
+	a.dx = pl.d * 1
+	a.dy = -1
 	a.d = pl.d
-	a.w = 2
-	a.h = 2
+	a.w = 0.5
+	a.h = 0.5
 
 	a.move = move_tongue
 	a.draw = draw_tongue
-	a.collide_event = tongue_collide_event
+	a.collide_test = tongue_actor_collision_test
 
 	return a
 
 
 end
+ 
+function tongue_actor_collision_test(a) 
 
-function tongue_collide_event(a, other) 
+	for a2 in all(actors) do 
+		if a2 != a and (not a2.is_player) then 
 
-	if (not other.is_player) then
-		del(actors, a)
-		del(actors, other)
+			local hit_point_x_coordinate = (a.d == 1) and a.x + 6 or a.x + 2
+			local hit_point_y_coordinate
+		
+			if (a2.x < hit_point_x_coordinate and hit_point_x_coordinate < a2.x + a2.w) and (a2.y < a.y and a.y < a2.y + a2.w) 
+			then
+				if not a2.is_player then
+					del(actors, a)
+					a=nil
+					del(actors, a2)
+					return
+				end
+			end
+		end	
 	end
-	
-end
-
+end	
 
 function move_tongue(a)
 
 	move_actor(a)
-	actor_collision(a)
+	a:collide_test()
+	move_actor(a)
+	a:collide_test()
 
 end
 
@@ -66,7 +79,6 @@ function draw_tongue(a)
 	for i = 0, abs(a.x-a.x0) do 
 		spr(a.k, a.x0 + a.d*i, a.y0 - i, 1, 1, a.d != 1)
 	end
-	print(a.x0)
 end
 
 -- movements for the player
@@ -75,12 +87,12 @@ function move_player(pl)
 	move_actor(pl)	
 	pl.dx = 0
 
-	if btn(➡️) then
+	if btn(➡️) and pl.x < 120 then
   		pl.dx = 1
 		pl.d = 1
 	end
 	
-	if btn(⬅️) then
+	if btn(⬅️) and pl.x > 0 then
 		pl.dx = -1
 		pl.d = -1
 	end

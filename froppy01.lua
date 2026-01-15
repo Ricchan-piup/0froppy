@@ -6,15 +6,14 @@
 -- the above lines should be commented out to run the game, they're just here to help the compiler locate the functions when coding.
 -- pico 8 will crash when reading these lines as it doesn't start looking for files from the same file 
 
-
 max_actors = 64
 counter = 0.1
-delay = 3
+delay = 1
 
 function _init()
 	init_actor_data()
 	init_level()
-	make_player()
+
 	timer = 0.5
 	
 	palt(0, false)

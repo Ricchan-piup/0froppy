@@ -31,7 +31,7 @@ function init_actor_data()
 			},
 			dx = 0, 
 			y = 0,
-			dy = 0.5 -- example of the move function being overwritten
+			dy = 0.5, -- example of the move function being overwritten
 		},
 
 		-- fire 
@@ -45,7 +45,7 @@ function init_actor_data()
 			dy = 1
 		},
 
-				-- fire 
+		-- plant
 		[53] = {
 			k = 53,
 			animations = {
@@ -83,14 +83,18 @@ function make_actor(k, x0, y0, d)
 		dx=0, dy=0, 
 		ddx=0, ddy=0, 
 		d = 1 or d,
-		w=4, -- hitbox width
-		h=4, -- hitbox height
+		w=8, -- hitbox width
+		h=8, -- hitbox height
 		
 		draw=draw_actor, 
 		move=move_actor,
-		collide_event=default_collide_event
-
 		}
+
+		if fget(a.k, 7) then
+			a.collide_test = ennemy_collision_test
+		else
+			a.collide_test = default_collision_test
+		end
 		
 		-- assigns the specific actor stats specified in init_actor_data
 		for k, v in pairs(actor_dat[k])
@@ -106,24 +110,13 @@ function make_actor(k, x0, y0, d)
 		
 end
 
-function actor_collision(a) 
-
-	for a2 in all(actors) do 
-		if a2 != a then 
-			local x = a.x + a.dx - a2.x
-			local y = a.y + a.dy - a2.y 
-		
-			if (abs(x) < a.w + a2.w) and (abs(y) < a.h + a2.h) 
-			then
-				return a:collide_event(a2)
-			end
-		end	
-	end
-	return false
-end	
-
 -- default move function for all the actors, can be overwritten
 function move_actor(a)
+
+	a:collide_test()
+	if a.y > 127 then
+		del(actors, a)
+	end
 
 	local current_anim = a.animations[a.state]
 
@@ -142,27 +135,44 @@ function move_actor(a)
 	
  	a.x += a.dx
 	a.y += a.dy
- 	
-end
 
--- the water_drop actor uses that function for move instead of move_actor
-function move_water_drop(a)
-	move_actor(a)
-	a.dx = cos(t())
 end
 
 -- default draw function for all the actors, can be overwritten
 function draw_actor(a)
-
 	local current_anim = a.animations[a.state]
 
 	spr(current_anim.start + a.anim_frame, a.x, a.y, 1, 1, not (a.d == 1))
-	if a.is_player then
-		print(a.state)
-	end   
-	
 end
 
+
+
+function default_collision_test(a)
+	return -- dummy function
+end
+
+function ennemy_collision_test(a)
+
+		if pl != nil then -- no need to check for collision when the projectile is far from the ground
+			local x = abs(a.x - pl.x) -- difference of x position between player and projectile
+			local y = abs(a.y - pl.y) -- difference of y position betweeb player and projectile
+			if x < 5 and y < 5  then -- game over if more than half the player overlaps with projectile
+				del(actors, pl)
+				pl = nil
+				del(actors, a)
+				game_state = 0
+			end	
+		end
+		if a.y > 111 then
+			if destroy_floor(a.x) then
+				del(actors, a)
+			end
+		end				
+end
+					
+					
+					
+	
 -- sets a new state, this will start a new animation cycle. 
 -- The state should be defined in the animations attribute of the actor 
 

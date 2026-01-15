@@ -7,4 +7,8 @@ function draw_map()
 		a:draw()
 	end
 
+	if game_state == 0 then
+		print("GAME OVER")
+	end
+
 end
