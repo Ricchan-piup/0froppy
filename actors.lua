@@ -69,6 +69,8 @@ end
 function make_actor(k, x0, y0, d)
 
 	local a = {
+		
+
 		k=k, -- sprite of actor/identificator in the actor database
 		
 		eaten = false, -- flag to know if the actor is currently eaten by the player, this is used to stop the move function of the actor when it's eaten.

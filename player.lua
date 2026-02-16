@@ -1,26 +1,97 @@
+--[[
+The different states for the player are defined as integer constants
+]]
+
+pl_idle = 1
+pl_walk = 2
+pl_attack = 3
+pl_stretching_tongue = 4
+pl_pulling_tongue = 5
+pl_eating_ennemy = 6
+
 -- overwrites make_actor to initialize the player (player is added to the actors table by make_actor)
 function make_player()
 
 	local a = make_actor(2, 64, 14*8, 1)
 
 	a.is_player = true
-	a.move = move_player
+	a.move = update_player
 	a.score = 0
 	a.tongue = nil
 	a.cooldown = false
+	a.state = pl_idle
 
-	a.states = {"iddle", "walk", "attack", "tongue_out", "eating_ennemy"}
-
-	a.animations = {
-		iddle = {start = 2, frames = 1, length = 0, loop = true},
-		walk = {start = 1, frames = 2, length = 5, loop = true},
-		attack = {start = 3, frames = 3, length = 1, loop = false, next_state = "tongue_out"},
-		tongue_out = {start =  6, frames = 1, length = 0, loop = false},
-		eating_ennemy = {start = 7, frames = 1, length = 0, loop = false}
-	}
-
+	a.updates = {
+		[pl_idle] = u_idle,
 		
+		[pl_walk] = u_walk,
+		[pl_attack] = function(a)
+			a.x += a.dx
+			a.y += a.dy
+		end,
+		[pl_stretching_tongue] = function(a)
+			a.x += a.dx
+			a.y += a.dy
+		end,
+		[pl_pulling_tongue] = function(a)
+			a.x -= a.dx
+			a.y -= a.dy
+		end,
+		[pl_eating_ennemy] = function(a)
+			eat_ennemy(a)
+		end
+}
+
+	-- a.animations = {
+	-- 	iddle = {start = 2, frames = 1, length = 0, loop = true},
+	-- 	walk = {start = 1, frames = 2, length = 5, loop = true},
+	-- 	attack = {start = 3, frames = 3, length = 1, loop = false, next_state = "tongue_out"},
+	-- 	tongue_out = {start =  6, frames = 1, length = 0, loop = false},
+	-- 	eating_ennemy = {start = 7, frames = 1, length = 0, loop = false}
+	-- }
+		a.animations = {
+		[pl_idle] = {start = 2, frames = 1, length = 0, loop = true},
+		[pl_walk] = {start = 1, frames = 2, length = 5, loop = true},
+		[pl_attack] = {start = 3, frames = 3, length = 1, loop = false, next_state = pl_stretching_tongue},
+		[pl_stretching_tongue] = {start =  3, frames = 3, length = 1, loop = false},
+		[pl_pulling_tongue] = {start = 7, frames = 1, length = 0, loop = false},
+		[pl_eating_ennemy] = {start = 7, frames = 1, length = 0, loop = false}
+	}
 	return a
+end
+
+-- 0 is the right button, 1 is left, 4 is w, 5 is x
+function u_idle(pl)
+	pl.dx = 0
+	if btn(0) or btn(1) then
+		set_state(pl, pl_walk)
+	elseif btn(4) then
+		set_state(pl, pl_stretching_tongue)
+	end
+end
+
+function u_walk(pl)
+	if btn(4) then 
+		set_state(pl, pl_stretching_tongue)
+	elseif btn(1) then
+		if is_floor(pl.x + 4) == true then
+			pl.d = 1
+			pl.dx = 1
+		end
+	elseif btn(0) then
+		if is_floor(pl.x - 5) == true then
+			pl.d = -1
+			pl.dx = -1
+		end
+	else 
+		set_state(pl, pl_idle)
+	end
+end
+
+function u_stretching_tongue(pl)
+	if btn(4) then 
+		
+	end
 end
 
 -- makes the tongue at the player's location, the data for the tongue can be seen in the actor's table in actors
@@ -192,5 +263,12 @@ function move_player(pl)
 		set_state(pl, "iddle")
 	end
 		
+	move_actor(pl)
+end
+
+function update_player(pl)
+	local update = pl.updates[pl.state]
+	update(pl)
+
 	move_actor(pl)
 end
