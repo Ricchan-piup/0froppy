@@ -56,7 +56,7 @@ function init_actor_data()
 			dy = 0.7
 		}
 										
-	}							
+	}				
 	
 end
 
@@ -71,6 +71,7 @@ function make_actor(k, x0, y0, d)
 	local a = {
 		k=k, -- sprite of actor/identificator in the actor database
 		
+		eaten = false, -- flag to know if the actor is currently eaten by the player, this is used to stop the move function of the actor when it's eaten.
 		current_sprite = k,
 		anim_frame = 0,
 		anim_timer = 0,
@@ -113,6 +114,10 @@ end
 -- default move function for all the actors, can be overwritten
 function move_actor(a)
 
+	if a.eaten then
+		return
+	end
+	
 	a:collide_test()
 	if a.y > 127 then
 		del(actors, a)
@@ -120,12 +125,14 @@ function move_actor(a)
 
 	local current_anim = a.animations[a.state]
 
-	if a.anim_frame == (current_anim.frames - 1) and not current_anim.loop 
-	then
-		a.anim_timer = 0
-		-- freeze on last frame
+
+	if a.anim_frame == (current_anim.frames - 1) and not current_anim.loop then
+		a.anim_timer = 0 -- freeze on last frame
 	else	
 		if (current_anim.length > 0 and a.anim_timer > current_anim.length) then
+			if a == pl and pl.state =="walk" and pl.anim_frame == 0 then --play sound when walking animation loops, this is a bit hacky but it works
+				sfx(0)
+			end
 			a.anim_frame = (a.anim_frame + 1)%current_anim.frames
 			a.anim_timer = 0
 		end	
@@ -158,8 +165,15 @@ function ennemy_collision_test(a)
 			local y = abs(a.y - pl.y) -- difference of y position betweeb player and projectile
 			if x < 5 and y < 5  then -- game over if more than half the player overlaps with projectile
 				-- TODO: refactor this into a game over state
-				del(actors, pl.tongue)
-				pl.tongue = nil
+
+				if pl.tongue then
+					del(actors, pl.tongue)
+					if pl.tongue.stuck_ennemy then
+						pl.tongue.stuck_ennemy.eaten = false
+					end
+					pl.tongue = nil
+				end
+
 				del(actors, pl)
 				pl = nil
 				del(actors, a)

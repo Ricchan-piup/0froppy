@@ -8,7 +8,6 @@ function init_level()
 	for i = 0, 16 do
 		ground[i] = 1
 	end
-
 	ground[-1] = 0
 	ground[16] = 0
 

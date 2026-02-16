@@ -9,13 +9,14 @@ function make_player()
 	a.tongue = nil
 	a.cooldown = false
 
-	a.states = {"iddle", "walk", "attack", "tongue_out"}
+	a.states = {"iddle", "walk", "attack", "tongue_out", "eating_ennemy"}
 
 	a.animations = {
 		iddle = {start = 2, frames = 1, length = 0, loop = true},
 		walk = {start = 1, frames = 2, length = 5, loop = true},
 		attack = {start = 3, frames = 3, length = 1, loop = false, next_state = "tongue_out"},
-		tongue_out = {start =  6, frames = 1, length = 0, loop = true},
+		tongue_out = {start =  6, frames = 1, length = 0, loop = false},
+		eating_ennemy = {start = 7, frames = 1, length = 0, loop = false}
 	}
 
 		
@@ -40,30 +41,35 @@ function make_tongue(pl)
 	a.move = move_tongue
 	a.draw = draw_tongue
 	a.collide_test = tongue_actor_collision_test
+	a.stuck_ennemy = nil
 
 	return a
 
 end
  
+--TODO: heavy in calculations, I could look for a flag at precise location and then check which ennemy is there instead.
 function tongue_actor_collision_test(a) 
 
-	if a.y > 108  then
+	if a.y > 108  then --hitbox isn't immediatly active when the tongue is spawned.
 		return
 	end
 	for a2 in all(actors) do 
 		if a2 != a and (not a2.is_player) then 
 
-			local hit_point_x_coordinate = (a.d == 1) and a.x + 6 or a.x + 2
-			local hit_point_y_coordinate
+			-- if the frogue is facing right, the hit point is a bit more to the right
+			local hit_point_x_coordinate = (a.d == 1) and a.x + 6 or a.x + 2 
+			local hit_point_y_coordinate = a.y
 		
-			if (a2.x < hit_point_x_coordinate and hit_point_x_coordinate < a2.x + a2.w) and (a2.y < a.y and a.y < a2.y + a2.w) 
+			if (a2.x < hit_point_x_coordinate and hit_point_x_coordinate < a2.x + a2.w) and (a2.y < hit_point_y_coordinate and hit_point_y_coordinate < a2.y + a2.h) 
 			then
 				if not a2.is_player then
-					del(actors, a)
-					a=nil
-					del(actors, a2)
-					set_state(pl, "iddle")
-					pl.cooldown = true
+					a.stuck_ennemy = a2
+					set_state(pl, "eating_ennemy")
+					-- del(actors, a)
+					-- a=nil
+					-- del(actors, a2)
+					-- set_state(pl, "iddle")
+					-- pl.cooldown = true
 					return
 				end
 			end
@@ -73,11 +79,49 @@ end
 
 function move_tongue(a)
 
+	if pl.state == "eating_ennemy" then
+		return
+	end
+
 	move_actor(a)
 	a:collide_test()
+	if a.stuck_ennemy != nil then -- prevents the tongue from eating two ennemies
+		return
+	end
 	move_actor(a)
 	a:collide_test()
 
+end
+
+function eat_ennemy(a)
+	if a.dy < 0 then
+		a.dy *= -2
+		a.dx *= -2
+		a.stuck_ennemy.dx = a.dx
+		a.stuck_ennemy.dy = a.dy
+		a.stuck_ennemy.y = a.y - 4
+		a.stuck_ennemy.eaten = true
+	end
+
+	--TODO: The tongue can collide with ennemy on the way back, correct it
+	if (a.stuck_ennemy).y < 108 then
+		move_actor(a)
+		move_actor(a)
+		a.stuck_ennemy.x += a.dx
+		a.stuck_ennemy.y += a.dy
+		a.stuck_ennemy.x += a.dx
+		a.stuck_ennemy.y += a.dy
+	else
+		a.stuck_ennemy.eaten = false
+		del(actors, a.stuck_ennemy)
+
+		a.dy *= -1/2
+		a.dx *= -1/2
+		a.stuck_ennemy = nil
+		a = nil
+		set_state(pl, "iddle")
+		pl.cooldown = true
+	end	
 end
 
 -- draws the tongue and the trail for the tongue to give the impression it stretches al
@@ -93,18 +137,25 @@ function move_player(pl)
 
 	pl.dx = 0
 
-	if btn(➡️) then
-		pl.d = 1
-		if is_floor(pl.x + 4) == true then
-			pl.dx = 1
-		end
+	if pl.state == "eating_ennemy" then
+		eat_ennemy(pl.tongue)	
+		return
 	end
-	
-	if btn(⬅️) then
-		pl.d = -1
-		if is_floor(pl.x - 5) == true then
-			pl.dx = -1
+
+	if not pl.is_attacking then
+		if btn(➡️) then
+			pl.d = 1
+			if is_floor(pl.x + 4) == true then
+				pl.dx = 1
+			end
 		end
+		
+		if btn(⬅️) then
+			pl.d = -1
+			if is_floor(pl.x - 5) == true then
+				pl.dx = -1
+			end
+		end	
 	end
 	
 	-- w
@@ -140,7 +191,6 @@ function move_player(pl)
 	then 
 		set_state(pl, "iddle")
 	end
-
-	move_actor(pl)	
 		
+	move_actor(pl)
 end
