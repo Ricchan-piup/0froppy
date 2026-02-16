@@ -1,11 +1,9 @@
 function init_actor_data()
-	
 	--list of index that corresponds to ennemies
-	ennemies = {21, 37, 53}
-	
+	ennemies = { 21, 37, 53 }
+
 	--data of all the actors in the game
 	actor_dat = {
-		
 		-- tongue
 		-- [6] = {
 		-- 	k = 6,
@@ -15,30 +13,30 @@ function init_actor_data()
 			k = 17,
 
 			animations = {
-				iddle = {start = 17, frames = 4, length = 5, loop = true}
+				iddle = { start = 17, frames = 4, length = 5, loop = true }
 			},
 
-			y = 0, 
+			y = 0,
 			dx = 0,
-			dy =  1,
+			dy = 1
 		},
-								
+
 		-- water drop
 		[21] = {
 			k = 21,
 			animations = {
-				iddle = {start = 21, frames = 6, length = 3, loop = true}
+				iddle = { start = 21, frames = 6, length = 3, loop = true }
 			},
-			dx = 0, 
+			dx = 0,
 			y = 0,
-			dy = 0.5, -- example of the move function being overwritten
+			dy = 0.5 -- example of the move function being overwritten
 		},
 
-		-- fire 
+		-- fire
 		[37] = {
 			k = 37,
 			animations = {
-				iddle = {start = 37, frames = 1, length = 0, loop = false}
+				iddle = { start = 37, frames = 1, length = 0, loop = false }
 			},
 			dx = 0,
 			y = 0,
@@ -49,17 +47,14 @@ function init_actor_data()
 		[53] = {
 			k = 53,
 			animations = {
-				iddle = {start = 53, frames = 1, length = 0, loop = false}
+				iddle = { start = 53, frames = 1, length = 0, loop = false }
 			},
 			dx = 0.2,
 			y = 0,
 			dy = 0.7
 		}
-										
-	}				
-	
+	}
 end
-
 
 -- makes an actor and add it to the "actors" created by init_level (in level.lua)
 -- during _init()
@@ -67,59 +62,53 @@ end
 -- every actor has a draw and move function by default, it can be artificially over-written
 -- by simply assigning a new variable to the move or draw attribute.
 function make_actor(k, x0, y0, d)
-
 	local a = {
-		
+		k = k, -- sprite of actor/identificator in the actor database
 
-		k=k, -- sprite of actor/identificator in the actor database
-		
 		eaten = false, -- flag to know if the actor is currently eaten by the player, this is used to stop the move function of the actor when it's eaten.
 		current_sprite = k,
 		anim_frame = 0,
 		anim_timer = 0,
 		state = "iddle",
-		animations = { 
-			iddle = {start = k, frames = 4, length = 10, loop = true}
+		animations = {
+			iddle = { start = k, frames = 4, length = 10, loop = true }
 		},
 
-		x=x0, y=y0, 
-		dx=0, dy=0, 
-		ddx=0, ddy=0, 
+		x = x0, y = y0,
+		dx = 0, dy = 0,
+		ddx = 0, ddy = 0,
 		d = 1 or d,
-		w=8, -- hitbox width
-		h=8, -- hitbox height
-		
-		draw=draw_actor, 
-		move=move_actor,
-		}
+		w = 8, -- hitbox width
+		h = 8, -- hitbox height
 
-		if fget(a.k, 7) then
-			a.collide_test = ennemy_collision_test
-		else
-			a.collide_test = default_collision_test
-		end
-		
-		-- assigns the specific actor stats specified in init_actor_data
-		for k, v in pairs(actor_dat[k])
-		do
-			a[k] = v
-		end
-		
-		if (#actors < max_actors) then
-			add(actors, a)
-		end
-	
+		draw = draw_actor,
+		move = move_actor
+	}
+
+	if fget(a.k, 7) then
+		a.collide_test = ennemy_collision_test
+	else
+		a.collide_test = default_collision_test
+	end
+
+	-- assigns the specific actor stats specified in init_actor_data
+	for k, v in pairs(actor_dat[k]) do
+		a[k] = v
+	end
+
+	if (#actors < max_actors) then
+		add(actors, a)
+	end
+
 	return a
-		
 end
 
 -- default move function for all the actors, can be overwritten
 function move_actor(a)
-
 	if a.eaten then
 		return
 	end
-	
+
 	a:collide_test()
 	if a.y > 127 then
 		del(actors, a)
@@ -127,24 +116,23 @@ function move_actor(a)
 
 	local current_anim = a.animations[a.state]
 
-
 	if a.anim_frame == (current_anim.frames - 1) and not current_anim.loop then
 		a.anim_timer = 0 -- freeze on last frame
-	else	
+	else
 		if (current_anim.length > 0 and a.anim_timer > current_anim.length) then
-			if a == pl and pl.state =="walk" and pl.anim_frame == 0 then --play sound when walking animation loops, this is a bit hacky but it works
+			if a == pl and pl.state == "walk" and pl.anim_frame == 0 then
+				--play sound when walking animation loops, this is a bit hacky but it works
 				sfx(0)
 			end
-			a.anim_frame = (a.anim_frame + 1)%current_anim.frames
+			a.anim_frame = (a.anim_frame + 1) % current_anim.frames
 			a.anim_timer = 0
-		end	
-	end 
+		end
+	end
 
 	a.anim_timer += 1
-	
- 	a.x += a.dx
-	a.y += a.dy
 
+	a.x += a.dx
+	a.y += a.dy
 end
 
 -- default draw function for all the actors, can be overwritten
@@ -154,55 +142,62 @@ function draw_actor(a)
 	spr(current_anim.start + a.anim_frame, a.x, a.y, 1, 1, not (a.d == 1))
 end
 
-
-
 function default_collision_test(a)
-	return -- dummy function
+	return
+	-- dummy function
 end
 
+--TODO: Create a function that interacts with tongue.
 function ennemy_collision_test(a)
-
-		if pl != nil then -- no need to check for collision when the projectile is far from the ground
-			local x = abs(a.x - pl.x) -- difference of x position between player and projectile
-			local y = abs(a.y - pl.y) -- difference of y position betweeb player and projectile
-			if x < 5 and y < 5  then -- game over if more than half the player overlaps with projectile
-				-- TODO: refactor this into a game over state
-
-				if pl.tongue then
-					del(actors, pl.tongue)
-					if pl.tongue.stuck_ennemy then
-						pl.tongue.stuck_ennemy.eaten = false
-					end
-					pl.tongue = nil
+	if pl != nil then
+		-- no need to check for collision when the projectile is far from the ground
+		local x = abs(a.x - pl.x) -- difference of x position between player and projectile
+		local y = abs(a.y - pl.y) -- difference of y position betweeb player and projectile
+		if x < 5 and y < 5 then
+			-- game over if more than half the player overlaps with projectile
+			-- TODO: refactor this into a game over state
+			if pl.tongue then
+				-- del(actors, pl.tongue)
+				if pl.tongue.stuck_ennemy then
+					pl.tongue.stuck_ennemy.eaten = false
 				end
-
-				del(actors, pl)
-				pl = nil
-				del(actors, a)
-				game_state = 0
-			end	
-		end
-		if a.y > 111 then
-			if destroy_floor(a.x) then
-				del(actors, a)
+				-- pl.tongue = nil
 			end
-		end				
-end
-					
-					
-					
-	
--- sets a new state, this will start a new animation cycle. 
--- The state should be defined in the animations attribute of the actor 
 
--- A state defines an animation cycle, it has a starting frame, a number of frames, 
+			del(actors, pl)
+			pl = nil
+			del(actors, a)
+			game_state = 0
+		end
+	end
+	if a.y > 111 then
+		if destroy_floor(a.x) then
+			del(actors, a)
+		end
+	end
+end
+
+-- sets a new state, this will start a new animation cycle.
+-- The state should be defined in the animations attribute of the actor
+
+-- A state defines an animation cycle, it has a starting frame, a number of frames,
 -- a length for each frame and wether it loops or not
 function set_state(a, new_state)
-	    if a.state != new_state then 
-        a.state = new_state
-        a.anim_frame = 0 -- Reset frame when state changes
-        a.anim_timer = 0
-    end
+	if a.state == new_state then --safety check
+		return
+	end
+	local exit_state = a.states[a.state].exit or nil -- executes the exit function of the previous state if it exists
+	if exit_state then
+		exit_state(a)
+	end
+
+	a.state = new_state
+	local enter_state = a.states[a.state].enter or nil -- executes the enter function of the new state if it exists
+	if enter_state then
+		enter_state(a)
+	end
+
+	-- Reset animation data when state changes
+	a.anim_frame = 0
+	a.anim_timer = 0
 end
-
-
