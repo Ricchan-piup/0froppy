@@ -18,7 +18,7 @@ function make_player()
 	a.move = update_player
 	a.score = 0
 	a.tongue = nil
-	a.cooldown = false
+	a.canAttack = true -- used to prevent player from spamming tongue by holding btn(4)
 	a.state = pl_idle
 
 	a.states = {
@@ -49,7 +49,6 @@ function make_player()
 			exit = nil
 		},
 
-		--TODO: prevent tongue from being created again just after it came back (boolean)
 		[pl_stretching_tongue] = {
 			enter = function(a)
 				a.tongue = make_tongue(a)
@@ -59,19 +58,33 @@ function make_player()
 				local tongue = a.tongue
 				tongue.cancollide = false
 				if tongue != nil then
-					tongue.dx *= -2 
-					tongue.dy *= -2
+					tongue.speed *=3
+					tongue.dx *= -1
+					tongue.dy *= -1
 					debug += 1
 				end
 			end
 		},
 
 		[pl_pulling_tongue] = {
-			enter = nil,
+			enter = function(a)
+				local tongue = a.tongue
+				local ennemy = tongue.stuck_ennemy
+				if ennemy != nil then
+					ennemy.isActive = false
+				end
+			end,
 			update = u_pulling_tongue,
 			exit = function(a)
+				local tongue = a.tongue
+				local ennemy = tongue.stuck_ennemy
+				if ennemy != nil then
+					del(actors, ennemy)
+					ennemy = nil
+				end
 				del(actors, a.tongue)
 				a.tongue = nil
+				a.canAttack = false
 			end
 		},
 
@@ -104,16 +117,24 @@ end
 
 -- 0 is the right button, 1 is left, 4 is w, 5 is x
 function u_idle(pl)
+	-- player needs to release the button before being able to attack again
+	if not btn(4) then
+		pl.canAttack = true
+	end
 	if btn(0) or btn(1) then
 		set_state(pl, pl_walk)
-	elseif btn(4) then
+	elseif btn(4) and pl.canAttack then
 		set_state(pl, pl_stretching_tongue)
 	end
 end
 
 function u_walk(pl)
+	-- player needs to release the button before being able to attack again
+	if not btn(4) then
+		pl.canAttack = true
+	end
 
-	if btn(4) then 
+	if btn(4) and pl.canAttack then 
 		set_state(pl, pl_stretching_tongue)
 
 	elseif btn(1) then
@@ -149,6 +170,11 @@ end
 function u_pulling_tongue(pl)
 
 	local tongue = pl.tongue
+	local ennemy = tongue.stuck_ennemy
+	if ennemy != nil then
+		ennemy.x = tongue.x
+		ennemy.y = tongue.y
+	end
 
 	if tongue.y > pl.y then
 		set_state(pl, pl_idle)
@@ -165,8 +191,9 @@ function make_tongue(pl)
 	a.x0 = pl.x
 	a.y0 = pl.y
 
-	a.dx = pl.d * 2
-	a.dy = -2
+	a.speed = 3
+	a.dx = pl.d * 1
+	a.dy = -1
 	a.d = pl.d
 	a.w = 0.5
 	a.h = 0.5
@@ -185,10 +212,10 @@ end
 	--Also the collision is not very clean, i should probably do something with a hitbox
 function tongue_actor_collision_test(a) 
 	if a.cancollide == false then
-		return
+		return false
 	end
-	if a.y > 108  then --hitbox isn't immediatly active when the tongue is spawned.
-		return
+	if a.y > 108  then -- doesn't detect ennemies too close to frog.
+		return false
 	end
 	for a2 in all(actors) do 
 		if a2 != a and (not a2.is_player) then 
@@ -201,25 +228,32 @@ function tongue_actor_collision_test(a)
 			then
 				if not a2.is_player then
 					a.stuck_ennemy = a2
+					updateScore(a2)
 					set_state(pl, pl_pulling_tongue)
+					return true
+					-- TODO: updateScore()
 					-- del(actors, a)
 					-- a=nil
 					-- del(actors, a2)
 					-- set_state(pl, "iddle")
 					-- pl.cooldown = true
-					return
 				end
 			end
 		end	
 	end
+	return false
 end	
 
 --TODO: make a better function for this.
 function move_tongue(a)
 
-	-- I call move_actor twice to have more control over how I update the position of the tongue.
-	move_actor(a)
-	a:collide_test()
+	-- If there is a collision, the tongue stops moving
+	for i=1,a.speed do
+		move_actor(a)
+		if  a:collide_test() then
+			break
+		end
+	end
 
 end
 
@@ -232,7 +266,6 @@ function eat_ennemy(a)
 		a.stuck_ennemy.eaten = true
 	end
 
-	--TODO: The tongue can collide with ennemy on the way back, correct it
 	if (a.stuck_ennemy).y < 108 then
 		move_actor(a)
 		move_actor(a)

@@ -1,5 +1,6 @@
 -- initiates the list of actors
 game_state = 1
+score = 0
 
 function init_level()
 	
@@ -51,4 +52,14 @@ function destroy_floor(x)
 	end
 
 	return false
+end
+
+function updateScore(a)
+	if a.y < 40 then
+		score += 1000
+	elseif a.y < 80 then
+		score += 100
+	else
+		score += 10
+	end
 end

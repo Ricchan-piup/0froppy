@@ -65,7 +65,6 @@ function make_actor(k, x0, y0, d)
 	local a = {
 		k = k, -- sprite of actor/identificator in the actor database
 
-		eaten = false, -- flag to know if the actor is currently eaten by the player, this is used to stop the move function of the actor when it's eaten.
 		current_sprite = k,
 		anim_frame = 0,
 		anim_timer = 0,
@@ -80,9 +79,9 @@ function make_actor(k, x0, y0, d)
 		d = 1 or d,
 		w = 8, -- hitbox width
 		h = 8, -- hitbox height
-
+		isActive = true, -- used to prevent multiple collision detections
 		draw = draw_actor,
-		move = move_actor
+		move = move_actor,
 	}
 
 	if fget(a.k, 7) then
@@ -105,7 +104,7 @@ end
 
 -- default move function for all the actors, can be overwritten
 function move_actor(a)
-	if a.eaten then
+	if not a.isActive then
 		return
 	end
 

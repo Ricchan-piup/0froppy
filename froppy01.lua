@@ -34,4 +34,5 @@ end
 function _draw()
 	draw_map()
 	print(debug)
+	print(score)
 end
