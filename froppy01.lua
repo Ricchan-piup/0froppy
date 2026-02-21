@@ -26,13 +26,20 @@ function _update()
 		a:move()
 	end
 
+	for p in all(points) do
+		p:update()
+	end
+
 	if (timer - t() < 0) then
 		timer = t() + 4
 	end
 end
 
 function _draw()
+
+	cls(1)
+	spr(64, -5, 2, 4, 3)
 	draw_map()
-	print(debug)
-	print(score)
+	print("SCORE: " .. score, 48, 0, 6)
+
 end

@@ -29,7 +29,8 @@ function init_actor_data()
 			},
 			dx = 0,
 			y = 0,
-			dy = 0.5 -- example of the move function being overwritten
+			dy = 0.5, 
+			type = "water" -- example of the move function being overwritten
 		},
 
 		-- fire
@@ -40,7 +41,8 @@ function init_actor_data()
 			},
 			dx = 0,
 			y = 0,
-			dy = 1
+			dy = 1,
+			type = "fire"
 		},
 
 		-- plant
@@ -51,7 +53,8 @@ function init_actor_data()
 			},
 			dx = 0.2,
 			y = 0,
-			dy = 0.7
+			dy = 0.7,
+			type = "plant"
 		}
 	}
 end
@@ -101,6 +104,10 @@ function make_actor(k, x0, y0, d)
 
 	return a
 end
+
+function get_EnnemyType(a)
+	return a.type
+end	
 
 -- default move function for all the actors, can be overwritten
 function move_actor(a)

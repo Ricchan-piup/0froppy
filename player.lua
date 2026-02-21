@@ -21,6 +21,10 @@ function make_player()
 	a.canAttack = true -- used to prevent player from spamming tongue by holding btn(4)
 	a.state = pl_idle
 
+	a.plant = 0
+	a.water = 0
+	a.fire = 0
+
 	a.states = {
 		[pl_idle] = {
 			enter = function(a)
@@ -79,6 +83,7 @@ function make_player()
 				local tongue = a.tongue
 				local ennemy = tongue.stuck_ennemy
 				if ennemy != nil then
+					chargeGauge(a, ennemy)
 					del(actors, ennemy)
 					ennemy = nil
 				end
@@ -228,10 +233,9 @@ function tongue_actor_collision_test(a)
 			then
 				if not a2.is_player then
 					a.stuck_ennemy = a2
-					updateScore(a2)
+					makePoints(a2)
 					set_state(pl, pl_pulling_tongue)
 					return true
-					-- TODO: updateScore()
 					-- del(actors, a)
 					-- a=nil
 					-- del(actors, a2)
@@ -298,4 +302,14 @@ function update_player(pl)
 	local update = pl.states[pl.state].update
 	update(pl)
 	move_actor(pl)
+end
+
+function chargeGauge(pl, ennemy)
+	if get_EnnemyType(ennemy) == "plant" then
+		pl.plant += 1
+	elseif get_EnnemyType(ennemy) == "water" then
+		pl.water += 1
+	elseif get_EnnemyType(ennemy) == "fire" then
+		pl.fire += 1
+	end
 end

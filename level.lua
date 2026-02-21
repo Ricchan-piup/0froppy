@@ -13,6 +13,7 @@ function init_level()
 	ground[16] = 0
 
 	actors = {}
+	points = {}
 	pl = make_player()
 	
 end
@@ -54,12 +55,65 @@ function destroy_floor(x)
 	return false
 end
 
-function updateScore(a)
+function makePoints(a)
+	local p = {
+		x = (a.x > 112) and 112 or a.x,
+		y = a.y - 4,
+		points = calculatePoints(a),
+		timer = 30,
+		update = updatePoints,
+		draw = drawPoints
+	}
+	p.color = computeColor(p)
+	
+	add(points, p)
+	score += p.points
+
+	return p
+	
+end
+
+function calculatePoints(a)
+	local points
 	if a.y < 40 then
-		score += 1000
+		points = 1000
 	elseif a.y < 80 then
-		score += 100
+		points = 100
 	else
-		score += 10
+		points = 10
+	end
+	return points
+end
+
+function computeColor(p)
+	local points = p.points
+	if points == 1000 then
+		return 10
+	elseif points == 100 then
+		return 3
+	else
+		return 2
 	end
 end
+
+function updatePoints(p)
+	local timer = p.timer
+	if timer < 0 then
+		del(points, p)
+		p = nil
+	else
+	local points = p.points
+	
+	if p.points == 1000 then
+		p.color = (p.color == 10) and 13 or 10
+	end
+
+	p.timer -= 1
+	end
+end
+
+function drawPoints(p)
+	print(p.points, p.x, p.y, p.color)
+	end
+
+
