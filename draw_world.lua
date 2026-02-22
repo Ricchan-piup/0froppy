@@ -14,22 +14,24 @@ function draw_map()
 		print("GAME OVER")
 	end
 
+
+
 	if pl.plant == 0 then
-		spr(64, -4, 2, 3) 
+		spr(64, -4, 2, 4, 1) 
 	else
-		spr(68+16*pl.plant, -4, 2, 3) 
+		spr(68+16*(pl.plant-1), -4, 2, 4, 1) 
 	end
 
 	if pl.water == 0 then
-		spr(64, -4, 10, 3) 
+		spr(64, -4, 10, 4, 1) 
 	else
-		spr(72+16*pl.water, -4, 10, 3) 
+		spr(72+16*(pl.water-1), -4, 10, 4, 1) 
 	end
 	
 	if pl.fire == 0 then
-		spr(64, -4, 18, 3) 
+		spr(64, -4, 18, 4, 1) 
 	else
-		spr(76+16*pl.fire, -4, 18, 3) 
+		spr(76+16*(pl.fire-1), -4, 18, 4, 1) 
 	end
 
 end

@@ -38,7 +38,6 @@ end
 function _draw()
 
 	cls(1)
-	spr(64, -5, 2, 4, 3)
 	draw_map()
 	print("SCORE: " .. score, 48, 0, 6)
 
