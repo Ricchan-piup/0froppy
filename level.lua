@@ -77,6 +77,7 @@ function calculatePoints(a)
 	local points
 	if a.y < 40 then
 		points = 1000
+		sfx(33, 1, 0, 31)
 	elseif a.y < 80 then
 		points = 100
 	else

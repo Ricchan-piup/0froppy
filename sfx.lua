@@ -30,23 +30,24 @@ function play_type_sfx(sfx_id, note_pos, type)
 
   if type == "fire" then
 	-- this sets instrument 110 (6) for fire
-	val = (val & ~(0b111 << 6)) | (0b110 << 6)
+	  val = (val & ~(0b111 << 6)) | (0b110 << 6)
 	-- effect bits 12..14 = 011
-	val = (val & ~(0b111 << 12)) | (0b011 << 12)
+	  val = (val & ~(0b111 << 12)) | (0b011 << 12)
 
     poke2(note1, val + 0b00000111)  -- adding 7 to the makes it one scale higher because the 5 first bits correspond to the pitch
   	poke2(note2, val)
     -- sets noise buzz and dampen for the effect 
-  	set_globalfx(30, make_globalfx(1,0,0,0,2)) 
+  	set_globalfx(30, make_globalfx(1,0,0,0,2))    
+      sfx(30, 2, 0, 2)  
   elseif type == "water" then
     val = (val & ~(0b111 << 6)) | (0b111 << 6) 
     val = (val & ~(0b111 << 12)) | (0b001 << 12)
-    poke2(note1, val)
+    poke2(note1, val + 0b00000111)  -- adding 7 to the makes it one scale higher because the 5 first bits correspond to the pitch
     val = (val & ~(0b111 << 12)) | (0b110 << 12)
-    poke2(note2, val + 0b00000111)  -- adding 7 to the makes it one scale higher because the 5 first bits correspond to the pitch
+    poke2(note2, val + 0b000010111)  -- adding 7 to the makes it one scale higher because the 5 first bits correspond to the pitch
     set_globalfx(30, make_globalfx(0,0,0,2,2))
-    elseif type == "plant" then
-    end
-  -- play the modified note
-  sfx(30, 2, 0, 2) 
+    sfx(30, 2, 0, 2) 
+  elseif type == "plant" then
+    sfx(32, 2, 0, 1) -- puts volume to 0 effectively removing the sound
+    end   
 end
