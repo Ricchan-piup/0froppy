@@ -56,7 +56,8 @@ function make_player()
 		[pl_stretching_tongue] = {
 			enter = function(a)
 				a.tongue = make_tongue(a)
-				sfx(1, 3)
+				local i = flr(rnd(3))
+				sfx(1+i, 3)
 			end,
 			update = u_stretching_tongue,
 			exit = function(a)
@@ -241,9 +242,11 @@ function tongue_actor_collision_test(a)
 			if (a2.x < hit_point_x_coordinate and hit_point_x_coordinate < a2.x + a2.w) and (a2.y < hit_point_y_coordinate and hit_point_y_coordinate < a2.y + a2.h) 
 			then
 				if not a2.is_player then
-					note = stat(23)
-					play_modified_sfx(1, note, 0, 3)
+					local note = stat(23)
+					local sfx = stat(19)
 					a.stuck_ennemy = a2
+					local type = get_EnnemyType(a2)
+					play_type_sfx(sfx , note, type)
 					makePoints(a2)
 					set_state(pl, pl_pulling_tongue)
 					return true
@@ -259,26 +262,9 @@ function tongue_actor_collision_test(a)
 	return false
 end	
 
-function play_modified_sfx(sfx_id, note_pos, instrument, effect)
-  -- 0x3200 is the start of SFX data
-  -- Each sfx is 68 bytes. Each note is 2 bytes.
-  -- 0x3200 + (sfx_id * 68) + (note_pos * 2) + 1 (instrument byte)
-
-  local addr1 = 0x3200 + (sfx_id * 68) + (note_pos * 2) + 2 + 1
-  local old_val1 = peek(addr1)  -- save original instrument
-  local addr2 = 0x3200 + (sfx_id * 68) + (note_pos * 2) + 1 -- address of the note to modify
-  local old_val2 = peek(addr2)  -- save original note
-  poke(addr1, 0b00110010)  -- 0 -useless bits- 011 (effect) 001 (instrument)
-  poke(addr2, 0b00110010)  -- set the note to play
-  -- play the modified note
-  sfx(sfx_id, 2, note_pos, 1)
-
---   poke(addr2, old_val2)  -- restore original note
-end
-
 
 --TODO: make a better function for this.
-function move_tongue(a)
+function move_tongue(a) 
 
 	-- If there is a collision, the tongue stops moving
 	for i=1,a.speed do
