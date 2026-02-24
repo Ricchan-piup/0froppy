@@ -36,7 +36,7 @@ function make_player()
 		
 		[pl_walk] = {
 			enter = function(a)
-				sfx(0)
+
 			end, 
 			update = u_walk, 
 			exit = function(a)
@@ -56,6 +56,7 @@ function make_player()
 		[pl_stretching_tongue] = {
 			enter = function(a)
 				a.tongue = make_tongue(a)
+				sfx(1, 3)
 			end,
 			update = u_stretching_tongue,
 			exit = function(a)
@@ -67,6 +68,7 @@ function make_player()
 					tongue.dy *= -1
 					debug += 1
 				end
+				sfx(-1, 3)
 			end
 		},
 
@@ -135,6 +137,13 @@ end
 
 function u_walk(pl)
 	-- player needs to release the button before being able to attack again
+
+	if frame == 0 and pl.anim_frame == 1 then
+		sfx(0)
+	end
+
+	frame = pl.anim_frame
+
 	if not btn(4) then
 		pl.canAttack = true
 	end
@@ -232,6 +241,8 @@ function tongue_actor_collision_test(a)
 			if (a2.x < hit_point_x_coordinate and hit_point_x_coordinate < a2.x + a2.w) and (a2.y < hit_point_y_coordinate and hit_point_y_coordinate < a2.y + a2.h) 
 			then
 				if not a2.is_player then
+					note = stat(23)
+					play_modified_sfx(1, note, 0, 3)
 					a.stuck_ennemy = a2
 					makePoints(a2)
 					set_state(pl, pl_pulling_tongue)
@@ -247,6 +258,24 @@ function tongue_actor_collision_test(a)
 	end
 	return false
 end	
+
+function play_modified_sfx(sfx_id, note_pos, instrument, effect)
+  -- 0x3200 is the start of SFX data
+  -- Each sfx is 68 bytes. Each note is 2 bytes.
+  -- 0x3200 + (sfx_id * 68) + (note_pos * 2) + 1 (instrument byte)
+
+  local addr1 = 0x3200 + (sfx_id * 68) + (note_pos * 2) + 2 + 1
+  local old_val1 = peek(addr1)  -- save original instrument
+  local addr2 = 0x3200 + (sfx_id * 68) + (note_pos * 2) + 1 -- address of the note to modify
+  local old_val2 = peek(addr2)  -- save original note
+  poke(addr1, 0b00110010)  -- 0 -useless bits- 011 (effect) 001 (instrument)
+  poke(addr2, 0b00110010)  -- set the note to play
+  -- play the modified note
+  sfx(sfx_id, 2, note_pos, 1)
+
+--   poke(addr2, old_val2)  -- restore original note
+end
+
 
 --TODO: make a better function for this.
 function move_tongue(a)
