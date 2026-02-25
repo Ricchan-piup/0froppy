@@ -8,6 +8,7 @@ pl_attack = 3
 pl_stretching_tongue = 4
 pl_pulling_tongue = 5
 pl_eating_ennemy = 6
+pl_dead = 7
 
 -- overwrites make_actor to initialize the player (player is added to the actors table by make_actor)
 function make_player()
@@ -18,7 +19,7 @@ function make_player()
 	a.move = update_player
 	a.score = 0
 	a.tongue = nil
-	a.canAttack = true -- used to prevent player from spamming tongue by holding btn(4)
+	a.canAttack = false -- used to prevent player from spamming tongue by holding btn(4)
 	a.state = pl_idle
 
 	a.plant = 0
@@ -102,6 +103,21 @@ function make_player()
 				eat_ennemy(a)
 			end,
 			exit = nil
+		},
+
+		[pl_dead] = {
+			enter = function(a)
+				if not a.tongue == nil then
+					del(actors, a.tongue)
+					a.tongue = nil
+				end 
+			end,
+			update = function () -- dummy function to prevent player from moving when dead
+				return
+			end,
+			exit = function () -- dummy function
+				return
+			end
 		}
 }
 
@@ -118,7 +134,8 @@ function make_player()
 		[pl_attack] = {start = 3, frames = 3, length = 1, loop = false, next_state = pl_stretching_tongue},
 		[pl_stretching_tongue] = {start =  3, frames = 3, length = 1, loop = false},
 		[pl_pulling_tongue] = {start = 7, frames = 1, length = 0, loop = false},
-		[pl_eating_ennemy] = {start = 7, frames = 1, length = 0, loop = false}
+		[pl_eating_ennemy] = {start = 7, frames = 1, length = 0, loop = false},
+		[pl_dead] = {start = 11, frames = 1, length = 0, loop = false}
 	}
 	return a
 end
@@ -314,7 +331,7 @@ end
 
 function update_player(pl)
 	local update = pl.states[pl.state].update
-	update(pl)
+	update(pl) 
 	move_actor(pl)
 end
 

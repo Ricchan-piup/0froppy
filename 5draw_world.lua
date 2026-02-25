@@ -15,7 +15,6 @@ function draw_map()
 	end
 
 
-
 	if pl.plant == 0 then
 		spr(64, -4, 2, 4, 1) 
 	else

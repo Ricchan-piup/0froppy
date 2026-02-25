@@ -160,25 +160,20 @@ function ennemy_collision_test(a)
 		local x = abs(a.x - pl.x) -- difference of x position between player and projectile
 		local y = abs(a.y - pl.y) -- difference of y position betweeb player and projectile
 		if x < 5 and y < 5 then
-			-- game over if more than half the player overlaps with projectile
-			-- TODO: refactor this into a game over state
-			if pl.tongue then
-				-- del(actors, pl.tongue)
-				if pl.tongue.stuck_ennemy then
-					pl.tongue.stuck_ennemy.eaten = false
-				end
-				-- pl.tongue = nil
-			end
-
-			del(actors, pl)
-			pl = nil
 			del(actors, a)
-			game_state = 0
+			a = nil
+			set_state(pl, pl_dead)
+			set_game_state("gameOver")
+			return
 		end
 	end
 	if a.y > 111 then
 		if destroy_floor(a.x) then
 			del(actors, a)
+		end
+		if a.y > 127 then -- if the projectile is below the screen, delete it
+			del(actors, a)
+			a = nil
 		end
 	end
 end
