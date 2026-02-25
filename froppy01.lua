@@ -2,8 +2,8 @@
 -- pico 8 will crash when reading these lines as it doesn't start looking for files from the same file
 
 max_actors = 64
-counter = 0.1
-delay = 0.5
+counter = 0.5
+delay = 2
 debug = 0
 
 function _init()
@@ -11,7 +11,7 @@ function _init()
 	init_level()
 
 	timer = 0.5
-
+	music(0)
 	palt(0, false)
 	palt(1, true)
 end
