@@ -140,7 +140,7 @@ function u_walk(pl)
 	-- player needs to release the button before being able to attack again
 
 	if frame == 0 and pl.anim_frame == 1 then
-		sfx(0)
+		sfx(0, 3)
 	end
 
 	frame = pl.anim_frame
@@ -242,13 +242,12 @@ function tongue_actor_collision_test(a)
 			if (a2.x < hit_point_x_coordinate and hit_point_x_coordinate < a2.x + a2.w) and (a2.y < hit_point_y_coordinate and hit_point_y_coordinate < a2.y + a2.h) 
 			then
 				if not a2.is_player then
-					local note = stat(23)
-					local sfx = stat(19)
 					a.stuck_ennemy = a2
-					local type = get_EnnemyType(a2)
-					play_type_sfx(sfx , note, type)
-					makePoints(a2)
+					local sfx_id = stat(19)
+					local note_pos = stat(23)
 					set_state(pl, pl_pulling_tongue)
+					play_type_sfx(get_EnnemyType(a2), sfx_id, note_pos)
+					makePoints(a2)
 					return true
 					-- del(actors, a)
 					-- a=nil

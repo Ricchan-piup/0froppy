@@ -128,7 +128,7 @@ function move_actor(a)
 		if (current_anim.length > 0 and a.anim_timer > current_anim.length) then
 			if a == pl and pl.state == "walk" and pl.anim_frame == 0 then
 				--play sound when walking animation loops, this is a bit hacky but it works
-				sfx(0)
+				-- sfx(0, 3)
 			end
 			a.anim_frame = (a.anim_frame + 1) % current_anim.frames
 			a.anim_timer = 0

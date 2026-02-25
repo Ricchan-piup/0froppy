@@ -15,7 +15,7 @@ function set_globalfx(sfx_index,effect)
 end
 
 
-function play_type_sfx(sfx_id, note_pos, type)
+function play_type_sfx(type, sfx_id, note_pos)
   -- 0x3200 is the start of SFX data
   -- Each sfx is 68 bytes. Each note is 2 bytes.
   -- 0x3200 + (sfx_id * 68) + (note_pos * 2) + 1 (instrument byte)
@@ -26,28 +26,36 @@ function play_type_sfx(sfx_id, note_pos, type)
   local note1 = 0x3200 + 30 * 68 + 0 
   local note2 = 0x3200 + 30 * 68 + 2
 
-  local sfx_id
-
   if type == "fire" then
 	-- this sets instrument 110 (6) for fire
 	  val = (val & ~(0b111 << 6)) | (0b110 << 6)
+    -- this sets volume to 5 for the note
+    val = (val & ~(0b111 << 9)) | (0b111 << 9)
 	-- effect bits 12..14 = 011
 	  val = (val & ~(0b111 << 12)) | (0b011 << 12)
+
+
 
     poke2(note1, val + 0b00000111)  -- adding 7 to the makes it one scale higher because the 5 first bits correspond to the pitch
   	poke2(note2, val)
     -- sets noise buzz and dampen for the effect 
   	set_globalfx(30, make_globalfx(1,0,0,0,2))    
-      sfx(30, 2, 0, 2)  
+    sfx(30, 3)  
   elseif type == "water" then
     val = (val & ~(0b111 << 6)) | (0b111 << 6) 
+    val = (val & ~(0b111 << 9)) | (0b101 << 9)
     val = (val & ~(0b111 << 12)) | (0b001 << 12)
     poke2(note1, val + 0b00000111)  -- adding 7 to the makes it one scale higher because the 5 first bits correspond to the pitch
     val = (val & ~(0b111 << 12)) | (0b110 << 12)
     poke2(note2, val + 0b000010111)  -- adding 7 to the makes it one scale higher because the 5 first bits correspond to the pitch
     set_globalfx(30, make_globalfx(0,0,0,2,2))
-    sfx(30, 2, 0, 2) 
+    sfx(30, 3, 0, 2) 
   elseif type == "plant" then
-    sfx(32, 2, 0, 1) -- puts volume to 0 effectively removing the sound
+    val = (val & ~(0b111 << 6)) | (0b001 << 6) 
+    val = (val & ~(0b111 << 9)) | (0b101 << 9)
+    val = (val & ~(0b111 << 12)) | (0b101 << 12)
+    poke2(note1, val + 0b00000111)  -- adding 7 to the makes it one scale higher because the 5 first bits correspond to the pitch
+    set_globalfx(30, make_globalfx(1,1,2,2,2))
+    sfx(30, 3, 0, 1)  -- puts volume to 0 effectively removing the sound
     end   
 end
