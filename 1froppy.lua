@@ -8,25 +8,6 @@ debug = 0
 
 current_game_state = "titleScreen"
 
-function u_playing()
-	if t() > counter then
-		spawn_ennemy()
-		counter = t() + delay
-	end
-
-	for a in all(actors) do
-		a:move()
-	end
-
-	for p in all(points) do
-		p:update()
-	end
-
-	if (timer - t() < 0) then
-		timer = t() + 4
-	end
-end
-
 game_states = {
 	titleScreen = {
 		init = function()
@@ -59,7 +40,9 @@ game_states = {
 			palt(0, false)
 			palt(1, true)
 		end,
-		update = u_playing,
+		update = function()
+			u_level()
+		end,
 		draw = function()
 			cls(1)
 			draw_level()
@@ -73,7 +56,7 @@ game_states = {
 			sfx(8, 3)
 		end,
 		update = function()
-			u_playing()
+			u_level()
 			if btn(4) then
 				set_game_state("titleScreen")
 			end
@@ -109,5 +92,5 @@ end
 function _draw()
 
 	game_states[current_game_state].draw()
-
+	print(debug)	
 end

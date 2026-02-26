@@ -51,14 +51,42 @@ function init_actor_data()
 			animations = {
 				iddle = { start = 53, frames = 1, length = 0, loop = false }
 			},
-			dx = 0.2,
+			vx = 0.5,
+			dx = 0,
 			y = 0,
 			dy = 0.7,
-			type = "plant"
+			type = "plant",
+			turning = false,
+			init = i_plant,
+			move = u_plant
 		}
 	}
 end
 
+function i_plant(a)
+	if a.x < 14*7 then
+		a.d = 1
+		a.dx = a.vx
+	elseif a.x > 8 then
+		a.d = -1
+		a.dx = -a.vx	
+	end
+end
+
+function u_plant(a)
+	move_actor(a)
+	if a.turning then
+		if abs(a.dx) < a.vx then
+			a.dx += a.d*0.05
+		else 
+			a.turning = false
+		end
+	elseif (a.x > 14*8 and a.d == 1) or (a.x < 8 and a.d == -1) then
+		a.d = -a.d
+		a.turning = true
+		a.dx += a.d*0.05
+	end
+end
 -- makes an actor and add it to the "actors" created by init_level (in level.lua)
 -- during _init()
 
@@ -102,6 +130,10 @@ function make_actor(k, x0, y0, d)
 		add(actors, a)
 	end
 
+	if a.init then
+		a:init()
+	end
+
 	return a
 end
 
@@ -123,13 +155,9 @@ function move_actor(a)
 	local current_anim = a.animations[a.state]
 
 	if a.anim_frame == (current_anim.frames - 1) and not current_anim.loop then
-		a.anim_timer = 0 -- freeze on last frame
+		a.anim_timer = 0 -- stops on  last frame if the animation doesn't loop
 	else
 		if (current_anim.length > 0 and a.anim_timer > current_anim.length) then
-			if a == pl and pl.state == "walk" and pl.anim_frame == 0 then
-				--play sound when walking animation loops, this is a bit hacky but it works
-				-- sfx(0, 3)
-			end
 			a.anim_frame = (a.anim_frame + 1) % current_anim.frames
 			a.anim_timer = 0
 		end
@@ -163,7 +191,6 @@ function ennemy_collision_test(a)
 			del(actors, a)
 			a = nil
 			set_state(pl, pl_dead)
-			set_game_state("gameOver")
 			return
 		end
 	end

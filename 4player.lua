@@ -68,7 +68,6 @@ function make_player()
 					tongue.speed *=3
 					tongue.dx *= -1
 					tongue.dy *= -1
-					debug += 1
 				end
 				sfx(-1, 3)
 			end
@@ -97,20 +96,13 @@ function make_player()
 			end
 		},
 
-		-- [pl_eating_ennemy] = {
-		-- 	enter = nil,
-		-- 	update = function(a)
-		-- 		eat_ennemy(a)
-		-- 	end,
-		-- 	exit = nil
-		-- },
-
 		[pl_dead] = {
 			enter = function(a)
 				if not a.tongue == nil then
 					del(actors, a.tongue)
 					a.tongue = nil
 				end 
+				set_game_state("gameOver")
 			end,
 			update = function () -- dummy function to prevent player from moving when dead
 				return
@@ -127,7 +119,6 @@ function make_player()
 		[pl_attack] = {start = 3, frames = 3, length = 1, loop = false, next_state = pl_stretching_tongue},
 		[pl_stretching_tongue] = {start =  3, frames = 3, length = 1, loop = false},
 		[pl_pulling_tongue] = {start = 7, frames = 1, length = 0, loop = false},
-		-- [pl_eating_ennemy] = {start = 7, frames = 1, length = 0, loop = false},
 		[pl_dead] = {start = 11, frames = 1, length = 0, loop = false}
 	}
 	return a
