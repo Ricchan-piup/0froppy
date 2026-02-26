@@ -5,10 +5,10 @@ __lua__
 -- robin berteloot
 
 #include 1froppy.lua
-#include 2actors.lua
-#include 3player.lua
-#include 4level.lua
-#include 5draw_world.lua
+#include 2level.lua
+#include 3actors.lua
+#include 4player.lua
+#include 5ui.lua
 #include 6sfx.lua
 
 

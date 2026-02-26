@@ -62,7 +62,7 @@ game_states = {
 		update = u_playing,
 		draw = function()
 			cls(1)
-			draw_map()
+			draw_level()
 			print("SCORE: " .. score, 48, 0, 6)
 		end
 	},
@@ -80,7 +80,7 @@ game_states = {
 		end,
 		draw = function()
 			cls(1)
-			draw_map()
+			draw_level()
 			print("SCORE: " .. score, 48, 0, 6)
 			print("GAME OVER", 48, 20, 7)
 			print("PRESS X TO RESTART", 32, 40, 7)
@@ -94,7 +94,6 @@ function set_game_state(new_state)
 		return
 	end
 	current_game_state = new_state
-	printh(game_states[new_state].init, "debug_log.txt")
 	_init()
 end
 

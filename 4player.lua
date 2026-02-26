@@ -97,13 +97,13 @@ function make_player()
 			end
 		},
 
-		[pl_eating_ennemy] = {
-			enter = nil,
-			update = function(a)
-				eat_ennemy(a)
-			end,
-			exit = nil
-		},
+		-- [pl_eating_ennemy] = {
+		-- 	enter = nil,
+		-- 	update = function(a)
+		-- 		eat_ennemy(a)
+		-- 	end,
+		-- 	exit = nil
+		-- },
 
 		[pl_dead] = {
 			enter = function(a)
@@ -121,20 +121,13 @@ function make_player()
 		}
 }
 
-	-- a.animations = {
-	-- 	iddle = {start = 2, frames = 1, length = 0, loop = true},
-	-- 	walk = {start = 1, frames = 2, length = 5, loop = true},
-	-- 	attack = {start = 3, frames = 3, length = 1, loop = false, next_state = "tongue_out"},
-	-- 	tongue_out = {start =  6, frames = 1, length = 0, loop = false},
-	-- 	eating_ennemy = {start = 7, frames = 1, length = 0, loop = false}
-	-- }
 		a.animations = {
 		[pl_idle] = {start = 2, frames = 1, length = 0, loop = true},
 		[pl_walk] = {start = 1, frames = 2, length = 5, loop = true},
 		[pl_attack] = {start = 3, frames = 3, length = 1, loop = false, next_state = pl_stretching_tongue},
 		[pl_stretching_tongue] = {start =  3, frames = 3, length = 1, loop = false},
 		[pl_pulling_tongue] = {start = 7, frames = 1, length = 0, loop = false},
-		[pl_eating_ennemy] = {start = 7, frames = 1, length = 0, loop = false},
+		-- [pl_eating_ennemy] = {start = 7, frames = 1, length = 0, loop = false},
 		[pl_dead] = {start = 11, frames = 1, length = 0, loop = false}
 	}
 	return a
@@ -155,7 +148,6 @@ end
 
 function u_walk(pl)
 	-- player needs to release the button before being able to attack again
-
 	if frame == 0 and pl.anim_frame == 1 then
 		sfx(0, 3)
 	end
@@ -266,11 +258,6 @@ function tongue_actor_collision_test(a)
 					play_type_sfx(get_EnnemyType(a2), sfx_id, note_pos)
 					makePoints(a2)
 					return true
-					-- del(actors, a)
-					-- a=nil
-					-- del(actors, a2)
-					-- set_state(pl, "iddle")
-					-- pl.cooldown = true
 				end
 			end
 		end	
@@ -290,35 +277,6 @@ function move_tongue(a)
 		end
 	end
 
-end
-
-
-function eat_ennemy(a)
-	if a.dy < 0 then
-		a.stuck_ennemy.dx = a.dx
-		a.stuck_ennemy.dy = a.dy
-		a.stuck_ennemy.y = a.y - 4
-		a.stuck_ennemy.eaten = true
-	end
-
-	if (a.stuck_ennemy).y < 108 then
-		move_actor(a)
-		move_actor(a)
-		a.stuck_ennemy.x += a.dx
-		a.stuck_ennemy.y += a.dy
-		a.stuck_ennemy.x += a.dx
-		a.stuck_ennemy.y += a.dy
-	else
-		a.stuck_ennemy.eaten = false
-		del(actors, a.stuck_ennemy)
-
-		a.dy *= -1/2
-		a.dx *= -1/2
-		a.stuck_ennemy = nil
-		a = nil
-		set_state(pl, "iddle")
-		pl.cooldown = true
-	end	
 end
 
 -- draws the tongue and the trail for the tongue to give the impression it stretches al
