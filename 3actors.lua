@@ -162,6 +162,8 @@ function move_actor(a)
 			a.anim_timer = 0
 		end
 	end
+	-- updates the current sprite of the actor based on its animation
+	a.current_sprite = current_anim.start + a.anim_frame
 
 	a.anim_timer += 1
 
@@ -173,7 +175,7 @@ end
 function draw_actor(a)
 	local current_anim = a.animations[a.state]
 
-	spr(current_anim.start + a.anim_frame, a.x, a.y, 1, 1, not (a.d == 1))
+	spr(a.current_sprite, a.x, a.y, 1, 1, not (a.d == 1))
 end
 
 function default_collision_test(a)
