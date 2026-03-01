@@ -4,7 +4,6 @@
 max_actors = 64
 counter = 0.5
 delay = 2
-debug = 0
 
 current_game_state = "titleScreen"
 
@@ -26,7 +25,18 @@ game_states = {
 		draw = function()
 			cls(1)
 			print("FROPPY", 48, 20, 7)
-			print("PRESS X TO START", 32, 40, 7)
+			print("PRESS X TO START", 32, 64, 7)
+						-- sprite #44 top-left on sheet is (96,16)
+			local sx,sy = 96,16
+			local sw,sh = 24,16
+			local scale = 3
+			local dw,dh = sw*scale, sh*scale
+			
+			local x = 64 - dw/2
+			local y = 104 - dh/2
+			
+			sspr(sx,sy, sw,sh, x,y, dw,dh)
+			-- spr(45,0,0)
 		end
 	},
 
@@ -92,5 +102,4 @@ end
 function _draw()
 
 	game_states[current_game_state].draw()
-	print(debug)	
 end

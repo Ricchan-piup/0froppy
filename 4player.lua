@@ -127,8 +127,6 @@ end
 
 function d_player(pl)
 	draw_actor(pl)
-	local dy = fget(pl.current_sprite) or 0
-	spr(39,pl.x, pl.y - 6 - dy, 1, 1, pl.d != 1)
 end
 
 -- 0 is the right button, 1 is left, 4 is w, 5 is x

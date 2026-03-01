@@ -76,19 +76,25 @@ end
 function draw_magic_gauges(pl)
 	if pl.plant == 0 then
 		spr(64, -4, 2, 4, 1) 
-	else
+	elseif pl.plant < 4 then
 		spr(68+16*(pl.plant-1), -4, 2, 4, 1) 
+	else
+		spr(116, -4, 2, 4, 1)
 	end
 
 	if pl.water == 0 then
 		spr(64, -4, 10, 4, 1) 
-	else
+	elseif pl.water < 4 then
 		spr(72+16*(pl.water-1), -4, 10, 4, 1) 
+	else 
+		spr(120, -4, 10, 4, 1)
 	end
 	
 	if pl.fire == 0 then
 		spr(64, -4, 18, 4, 1) 
-	else
+	elseif pl.fire < 4 then
 		spr(76+16*(pl.fire-1), -4, 18, 4, 1) 
+	else
+		spr(124, -4, 18, 4, 1)
 	end
 end

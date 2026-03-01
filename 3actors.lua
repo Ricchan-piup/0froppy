@@ -25,7 +25,7 @@ function init_actor_data()
 		[21] = {
 			k = 21,
 			animations = {
-				iddle = { start = 21, frames = 6, length = 3, loop = true }
+				iddle = { start = 21, frames = 6, length = 5, loop = true }
 			},
 			dx = 0,
 			y = 0,
@@ -37,7 +37,7 @@ function init_actor_data()
 		[37] = {
 			k = 37,
 			animations = {
-				iddle = { start = 37, frames = 1, length = 0, loop = false }
+				iddle = { start = 37, frames = 5, length = 5, loop = true }
 			},
 			dx = 0,
 			y = 0,
@@ -49,7 +49,7 @@ function init_actor_data()
 		[53] = {
 			k = 53,
 			animations = {
-				iddle = { start = 53, frames = 1, length = 0, loop = false }
+				iddle = { start = 53, frames = 1, length = 0, loop = false}
 			},
 			vx = 0.5,
 			dx = 0,
