@@ -14,11 +14,11 @@ game_states = {
 			sfx(9, 3) 
 		end,
 		update = function()
-			if not btn(4) then
+			if not btn(5) then
 				canStart = true
 			end
 			-- update title screen variables here
-			if btn(4) and canStart then
+			if btn(5) and canStart then
 				set_game_state("playing")
 			end
 		end,
@@ -34,7 +34,7 @@ game_states = {
 			
 			local x = 64 - dw/2
 			local y = 104 - dh/2
-			
+			palt(0, false)
 			sspr(sx,sy, sw,sh, x,y, dw,dh)
 			-- spr(45,0,0)
 		end
@@ -67,7 +67,7 @@ game_states = {
 		end,
 		update = function()
 			u_level()
-			if btn(4) then
+			if btn(5) then
 				set_game_state("titleScreen")
 			end
 		end,
